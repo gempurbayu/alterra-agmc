@@ -2,6 +2,7 @@ package database
 
 import (
 	"day2-agmc/config"
+	"day2-agmc/middlewares"
 	"day2-agmc/models"
 )
 
@@ -41,5 +42,23 @@ func UpdateUser(id int, user models.User) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	return user, nil
+}
+
+func LoginUsers(user *models.User) (interface{}, error) {
+	var err error
+	if err = config.DB.Where("email = ? AND password = ?", user.Email, user.Password).First(user).Error; err != nil {
+		return nil, err
+	}
+
+	user.Token, err = middlewares.CreateToken(int(user.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := config.DB.Save(user).Error; err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }

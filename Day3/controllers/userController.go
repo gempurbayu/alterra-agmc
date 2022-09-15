@@ -77,3 +77,17 @@ func UpdateUserByIDController(c echo.Context) error {
 		"data": userDb,
 	})
 }
+
+func LoginUsersController(c echo.Context) error {
+	user := models.User{}
+	c.Bind(&user)
+
+	users, e := database.LoginUsers(&user)
+	if e != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, e.Error())
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "success login",
+		"users":  users,
+	})
+}
